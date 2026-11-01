@@ -162,6 +162,19 @@ dibujo2D.addEventListener("click", (evento) => {
 });
 
 
+function obtenerHidrogenosImplicitos(atomo) {
+
+    const datos = elementos[atomo.elemento];
+
+    if (!datos) return 0;
+
+    const valenciaUsada = obtenerValenciaUsada(atomo.id);
+
+    const disponibles = datos.valenciaMaxima - valenciaUsada;
+
+    return Math.max(0, Math.floor(disponibles));
+}
+
 function actualizarVista2D() {
 
     const ancho = dibujo2D.clientWidth;
@@ -277,7 +290,9 @@ function actualizarVista2D() {
         texto.setAttribute("text-anchor", "middle");
         texto.setAttribute("dominant-baseline", "central");
 
-        texto.textContent = datos.simbolo;
+        const hidrogenos = obtenerHidrogenosImplicitos(atomo);
+        
+        texto.textContent = datos.simbolo + (hidrogenos > 0 ? "H" + hidrogenos : "");
 
         dibujo2D.appendChild(texto);
     });
