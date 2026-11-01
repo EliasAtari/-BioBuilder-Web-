@@ -1,42 +1,127 @@
-<div class="aplicacion">
 
-    <aside class="barra-lateral">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <h2>BBM</h2>
+    <title>BioBuilder WEB 2.1</title>
 
-        <button>Cuenta</button>
-        <button>Biblioteca química</button>
-        <button>Elementos</button>
-        <button>Ajustes</button>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
 
-        <hr>
+<body>
 
-        <button>Agregar átomo</button>
-        <button>Eliminar</button>
-        <button>Crear enlace</button>
-
-    </aside>
-
-    <main class="area-construccion">
+    <div class="aplicacion">
 
         <header class="barra-superior">
-            <h2>BioBuilder WEB 2.1</h2>
-            <span>FPS: 60</span>
+            <div class="identidad">
+                <span class="logo">BB</span>
+                <h1>BioBuilder</h1>
+                <span class="version">WEB 2.1</span>
+            </div>
+
+            <div class="informacion-sistema">
+                <span id="fps">FPS: --</span>
+                <span id="estado">Sistema preparado</span>
+            </div>
         </header>
 
-        <section id="visor" class="visor-molecular">
-            <div id="mensaje-inicial">
-                <h1>Espacio molecular</h1>
-                <p>Construye tus moléculas aquí.</p>
-            </div>
-        </section>
+        <div class="contenido">
 
-        <footer class="informacion-molecular">
-            <span>Fórmula: —</span>
-            <span>Átomos: 0</span>
-            <span>Enlaces: 0</span>
-        </footer>
+            <aside class="barra-lateral">
 
-    </main>
+                <section class="grupo-herramientas">
+                    <h2>Cuenta</h2>
+                    <button id="cuenta">Mi cuenta</button>
+                </section>
 
-</div>
+                <section class="grupo-herramientas">
+                    <h2>Biblioteca</h2>
+                    <button id="biblioteca">Biblioteca química</button>
+                </section>
+
+                <section class="grupo-herramientas">
+                    <h2>Elementos</h2>
+                    <button id="elementos">Elementos seleccionados</button>
+                </section>
+
+                <section class="grupo-herramientas">
+                    <h2>Construcción</h2>
+                    <button id="agregar-atomo">Agregar átomo</button>
+                    <button id="eliminar">Eliminar átomo</button>
+                    <button id="crear-enlace">Crear enlace</button>
+                </section>
+
+                <section class="grupo-herramientas">
+                    <h2>Configuración</h2>
+                    <button id="ajustes">Ajustes</button>
+                </section>
+
+            </aside>
+
+            <main class="area-construccion">
+
+                <div class="encabezado-visor">
+                    <div>
+                        <h2>Espacio molecular</h2>
+                        <span id="vista-actual">Vista 3D</span>
+                    </div>
+
+                    <div class="controles-vista">
+                        <button id="modo-2d">2D</button>
+                        <button id="modo-3d" class="activo">3D</button>
+                    </div>
+                </div>
+
+                <div id="visor" class="visor-molecular">
+
+                    <div id="contenedor-plano2D" hidden>
+                        <svg id="dibujo-plano2D"></svg>
+                    </div>
+
+                    <div id="mensaje-inicial">
+                        <h2>Espacio molecular</h2>
+                        <p>
+                            Aquí podrás construir y visualizar
+                            tus moléculas.
+                        </p>
+                        <p>Selecciona una herramienta para comenzar.</p>
+                    </div>
+
+                </div>
+
+                <footer class="informacion-molecular">
+
+                    <div class="dato">
+                        <span>Fórmula</span>
+                        <strong id="formula">—</strong>
+                    </div>
+
+                    <div class="dato">
+                        <span>Átomos</span>
+                        <strong id="cantidad-atomos">0</strong>
+                    </div>
+
+                    <div class="dato">
+                        <span>Enlaces</span>
+                        <strong id="cantidad-enlaces">0</strong>
+                    </div>
+
+                    <div class="dato">
+                        <span>Temperatura</span>
+                        <strong id="temperatura">No asignada</strong>
+                    </div>
+
+                </footer>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <script src="js/principal.js"></script>
+
+</body>
+</html>
