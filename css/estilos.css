@@ -280,3 +280,7 @@ button.activo {
         font-size: 12px;
     }
     }
+
+[hidden] {
+    display: none !important;
+}
