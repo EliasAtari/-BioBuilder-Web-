@@ -5,31 +5,34 @@ let herramientaAgregarActiva = false;
 let elementoSeleccionado = null;
 
 function activarHerramientaAgregar() {
-  herramientaAgregarActiva = true;
-  elementoSeleccionado = null;
+
+    const respuesta = prompt(
+        "Escribe el símbolo del elemento químico que deseas agregar:"
+    );
+
+    if (respuesta === null) return;
+
+    const simbolo = respuesta.trim();
+
+    if (!elementos[simbolo]) {
+        alert("El elemento químico no existe o no está disponible.");
+        return;
+    }
+
+    elementoSeleccionado = simbolo;
+    herramientaAgregarActiva = true;
+
+    console.log("Herramienta Agregar activada:", simbolo);
 }
 
 function desactivarHerramientaAgregar() {
-  herramientaAgregarActiva = false;
-  elementoSeleccionado = null;
-}
-
-function seleccionarElemento(simbolo) {
-  if (elementos[simbolo]) {
-    console.error("Elemento quimico no válido:", simbolo);
-    return;
-  }
-
-elementoSeleccionado = simbolo;
+    herramientaAgregarActiva = false;
+    elementoSeleccionado = null;
 }
 
 function colocarAtomo(x, y) {
-  if (!herramientaAgregarActiva) return;
 
-    if (!elementoSeleccionado) {
-        console.warn("Primero debes seleccionar un elemento.");
-        return;
-    }
+    if (!herramientaAgregarActiva) return;
 
     const nuevoAtomo = {
         id: siguienteId++,
