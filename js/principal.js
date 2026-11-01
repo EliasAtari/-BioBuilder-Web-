@@ -161,73 +161,125 @@ dibujo2D.addEventListener("click", (evento) => {
     }
 });
 
+
 function actualizarVista2D() {
 
     const ancho = dibujo2D.clientWidth;
     const alto = dibujo2D.clientHeight;
 
+    if (ancho === 0 || alto === 0) return;
+
     dibujo2D.setAttribute("viewBox", `0 0 ${ancho} ${alto}`);
 
     dibujo2D.innerHTML = "";
-    
+
     enlaces.forEach(enlace => {
 
-    const atomoA = atomos.find(a => a.id === enlace.atomoA);
-    const atomoB = atomos.find(a => a.id === enlace.atomoB);
+        const atomoA = atomos.find(a => a.id === enlace.atomoA);
+        const atomoB = atomos.find(a => a.id === enlace.atomoB);
 
-    if (!atomoA || !atomoB) return;
+        if (!atomoA || !atomoB) return;
 
-    const dx = atomoB.x - atomoA.x;
-    const dy = atomoB.y - atomoA.y;
-    const distancia = Math.hypot(dx, dy);
+        const dx = atomoB.x - atomoA.x;
+        const dy = atomoB.y - atomoA.y;
 
-    if (distancia === 0) return;
+        const distancia = Math.hypot(dx, dy);
 
-    const ux = dx / distancia;
-    const uy = dy / distancia;
+        if (distancia === 0) return;
 
-    const radio = 9;
-    const inicioX = atomoA.x + ux * radio;
-    const inicioY = atomoA.y + uy * radio;
-    const finalX = atomoB.x - ux * radio;
-    const finalY = atomoB.y - uy * radio;
+        const ux = dx / distancia;
+        const uy = dy / distancia;
 
-    const linea = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line"
-    );
+        const px = -uy;
+        const py = ux;
 
-    linea.setAttribute("x1", inicioX);
-    linea.setAttribute("y1", inicioY);
-    linea.setAttribute("x2", finalX);
-    linea.setAttribute("y2", finalY);
-    linea.setAttribute("stroke", "#ffffff");
-    linea.setAttribute("stroke-width", "2");
+        const radio = 9;
+        const separacion = 4;
 
-    dibujo2D.appendChild(linea);
-});
-    
+        const inicioX = atomoA.x + ux * radio;
+        const inicioY = atomoA.y + uy * radio;
+
+        const finalX = atomoB.x - ux * radio;
+        const finalY = atomoB.y - uy * radio;
+
+        const orden = Math.min(
+            3,
+            Math.max(1, Number(enlace.orden) || 1)
+        );
+
+        const desplazamientos = [];
+
+        if (orden === 1) {
+            desplazamientos.push(0);
+        }
+
+        if (orden === 2) {
+            desplazamientos.push(-separacion / 2, separacion / 2);
+        }
+
+        if (orden === 3) {
+            desplazamientos.push(-separacion, 0, separacion);
+        }
+
+        desplazamientos.forEach(desplazamiento => {
+
+            const linea = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line"
+            );
+
+            linea.setAttribute(
+                "x1",
+                inicioX + px * desplazamiento
+            );
+
+            linea.setAttribute(
+                "y1",
+                inicioY + py * desplazamiento
+            );
+
+            linea.setAttribute(
+                "x2",
+                finalX + px * desplazamiento
+            );
+
+            linea.setAttribute(
+                "y2",
+                finalY + py * desplazamiento
+            );
+
+            linea.setAttribute("stroke", "#ffffff");
+            linea.setAttribute("stroke-width", "2");
+            linea.setAttribute("stroke-linecap", "round");
+
+            dibujo2D.appendChild(linea);
+        });
+    });
+
     atomos.forEach(atomo => {
 
-    const datos = elementos[atomo.elemento];
-    if (!datos) return;
+        const datos = elementos[atomo.elemento];
 
-    const texto = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "text"
-    );
+        if (!datos) return;
 
-    texto.dataset.atomoId = atomo.id;
-    texto.setAttribute("x", atomo.x);
-    texto.setAttribute("y", atomo.y);
-    texto.setAttribute("fill", datos.color);
-    texto.setAttribute("font-size", "20");
-    texto.setAttribute("font-weight", "bold");
-    texto.setAttribute("text-anchor", "middle");
-    texto.setAttribute("dominant-baseline", "central");
-    texto.textContent = datos.simbolo;
+        const texto = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text"
+        );
 
-    dibujo2D.appendChild(texto);
+        texto.dataset.atomoId = atomo.id;
+
+        texto.setAttribute("x", atomo.x);
+        texto.setAttribute("y", atomo.y);
+        texto.setAttribute("fill", datos.color);
+        texto.setAttribute("font-size", "20");
+        texto.setAttribute("font-weight", "bold");
+        texto.setAttribute("text-anchor", "middle");
+        texto.setAttribute("dominant-baseline", "central");
+
+        texto.textContent = datos.simbolo;
+
+        dibujo2D.appendChild(texto);
     });
 }
 
