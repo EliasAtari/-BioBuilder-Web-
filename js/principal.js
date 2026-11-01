@@ -166,80 +166,67 @@ function actualizarVista2D() {
     dibujo2D.setAttribute("viewBox", `0 0 ${ancho} ${alto}`);
 
     dibujo2D.innerHTML = "";
-
+    
     enlaces.forEach(enlace => {
 
-        const atomoA = atomos.find(
-            atomo => atomo.id === enlace.atomoA
-        );
+    const atomoA = atomos.find(a => a.id === enlace.atomoA);
+    const atomoB = atomos.find(a => a.id === enlace.atomoB);
 
-        const atomoB = atomos.find(
-            atomo => atomo.id === enlace.atomoB
-        );
+    if (!atomoA || !atomoB) return;
 
-        if (!atomoA || !atomoB) return;
+    const dx = atomoB.x - atomoA.x;
+    const dy = atomoB.y - atomoA.y;
+    const distancia = Math.hypot(dx, dy);
 
-        const linea = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "line"
-        );
+    if (distancia === 0) return;
 
-        linea.setAttribute("x1", atomoA.x);
-        linea.setAttribute("y1", atomoA.y);
-        linea.setAttribute("x2", atomoB.x);
-        linea.setAttribute("y2", atomoB.y);
-        linea.setAttribute("stroke", "#ffffff");
-        linea.setAttribute("stroke-width", "2");
+    const ux = dx / distancia;
+    const uy = dy / distancia;
 
-        dibujo2D.appendChild(linea);
-    });
+    const radio = 9;
+    const inicioX = atomoA.x + ux * radio;
+    const inicioY = atomoA.y + uy * radio;
+    const finalX = atomoB.x - ux * radio;
+    const finalY = atomoB.y - uy * radio;
 
+    const linea = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+    );
+
+    linea.setAttribute("x1", inicioX);
+    linea.setAttribute("y1", inicioY);
+    linea.setAttribute("x2", finalX);
+    linea.setAttribute("y2", finalY);
+    linea.setAttribute("stroke", "#ffffff");
+    linea.setAttribute("stroke-width", "2");
+
+    dibujo2D.appendChild(linea);
+});
+    
     atomos.forEach(atomo => {
 
-        const datos = elementos[atomo.elemento];
+    const datos = elementos[atomo.elemento];
+    if (!datos) return;
 
-        if (!datos) return;
+    const texto = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+    );
 
-        const grupo = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "g"
-        );
+    texto.dataset.atomoId = atomo.id;
+    texto.setAttribute("x", atomo.x);
+    texto.setAttribute("y", atomo.y);
+    texto.setAttribute("fill", datos.color);
+    texto.setAttribute("font-size", "20");
+    texto.setAttribute("font-weight", "bold");
+    texto.setAttribute("text-anchor", "middle");
+    texto.setAttribute("dominant-baseline", "central");
+    texto.textContent = datos.simbolo;
 
-        grupo.dataset.atomoId = atomo.id;
-
-        const circulo = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "circle"
-        );
-
-        circulo.setAttribute("cx", atomo.x);
-        circulo.setAttribute("cy", atomo.y);
-        circulo.setAttribute("r", configuracionMolecular.radioAtomo2D);
-        circulo.setAttribute("fill", datos.color);
-        circulo.setAttribute("stroke", "#ffffff");
-        circulo.setAttribute("stroke-width", "1.5");
-
-        const texto = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "text"
-        );
-
-        texto.setAttribute("x", atomo.x);
-        texto.setAttribute("y", atomo.y);
-        texto.setAttribute("fill", datos.colorTexto);
-        texto.setAttribute("text-anchor", "middle");
-        texto.setAttribute("dominant-baseline", "central");
-        texto.setAttribute("font-size", "13");
-        texto.setAttribute("pointer-events", "none");
-        texto.textContent = datos.simbolo;
-
-        grupo.appendChild(circulo);
-        grupo.appendChild(texto);
-
-        dibujo2D.appendChild(grupo);
-    });
-}
-
+    dibujo2D.appendChild(texto);
+});
+    
 function actualizarInterfaz() {
 
     cantidadAtomos.textContent = atomos.length;
