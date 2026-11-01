@@ -116,12 +116,15 @@ boton3D.addEventListener("click", () => {
 });
 
 function obtenerCoordenadas(evento) {
-
+    
     const rectangulo = dibujo2D.getBoundingClientRect();
 
+    const ancho = dibujo2D.viewBox.baseVal.width;
+    const alto = dibujo2D.viewBox.baseVal.height;
+
     return {
-        x: evento.clientX - rectangulo.left,
-        y: evento.clientY - rectangulo.top
+        x: (evento.clientX - rectangulo.left) * (ancho / rectangulo.width),
+        y: (evento.clientY - rectangulo.top) * (alto / rectangulo.height)
     };
 }
 
