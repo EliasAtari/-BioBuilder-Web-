@@ -225,8 +225,9 @@ function actualizarVista2D() {
     texto.textContent = datos.simbolo;
 
     dibujo2D.appendChild(texto);
-});
-    
+    });
+}
+
 function actualizarInterfaz() {
 
     cantidadAtomos.textContent = atomos.length;
