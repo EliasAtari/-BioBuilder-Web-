@@ -281,6 +281,6 @@ button.activo {
     }
     }
 
-[hidden] {
+#mensaje-inicial[hidden] {
     display: none !important;
 }
