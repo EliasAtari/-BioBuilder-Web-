@@ -102,6 +102,7 @@ function cambiarVista(modo) {
         boton2D.classList.remove("activo");
 
         vistaActual.textContent = "Vista 3D";
+
         estado.textContent =
             "El módulo de visualización 3D está pendiente.";
     }
@@ -116,7 +117,7 @@ boton3D.addEventListener("click", () => {
 });
 
 function obtenerCoordenadas(evento) {
-    
+
     const rectangulo = dibujo2D.getBoundingClientRect();
 
     const ancho = dibujo2D.viewBox.baseVal.width;
@@ -132,14 +133,17 @@ dibujo2D.addEventListener("click", (evento) => {
 
     if (vistaActiva !== "2D") return;
 
-    const atomoSeleccionado = evento.target.closest("[data-atomo-id]");
+    const atomoSeleccionado =
+        evento.target.closest("[data-atomo-id]");
 
     if (atomoSeleccionado) {
 
         const id = Number(atomoSeleccionado.dataset.atomoId);
 
         if (herramientaActiva === "enlaces") {
+
             seleccionarAtomoParaEnlace(id);
+
             actualizarInterfaz();
             actualizarVista2D();
         }
@@ -161,18 +165,77 @@ dibujo2D.addEventListener("click", (evento) => {
     }
 });
 
-
 function obtenerHidrogenosImplicitos(atomo) {
 
-    const datos = elementos[atomo.elemento];
+    const valenciasPermitidas = {
+        C: 4,
+        N: 3,
+        O: 2
+    };
 
-    if (!datos) return 0;
+    const valenciaObjetivo =
+        valenciasPermitidas[atomo.elemento];
+
+    if (valenciaObjetivo === undefined) return 0;
 
     const valenciaUsada = obtenerValenciaUsada(atomo.id);
 
-    const disponibles = datos.valenciaMaxima - valenciaUsada;
+    return Math.max(
+        0,
+        valenciaObjetivo - valenciaUsada
+    );
+}
 
-    return Math.max(0, Math.floor(disponibles));
+function crearEtiquetaAtomo(atomo, datos) {
+
+    const texto = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+    );
+
+    texto.dataset.atomoId = atomo.id;
+
+    texto.setAttribute("x", atomo.x);
+    texto.setAttribute("y", atomo.y);
+    texto.setAttribute("fill", datos.color);
+    texto.setAttribute("font-size", "20");
+    texto.setAttribute("font-weight", "bold");
+    texto.setAttribute("text-anchor", "middle");
+    texto.setAttribute("dominant-baseline", "central");
+
+    texto.textContent = datos.simbolo;
+
+    const hidrogenos = obtenerHidrogenosImplicitos(atomo);
+
+    if (hidrogenos > 0) {
+
+        const etiquetaH = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "tspan"
+        );
+
+        etiquetaH.textContent = "H";
+        etiquetaH.setAttribute("fill", elementos.H.color);
+
+        texto.appendChild(etiquetaH);
+
+        if (hidrogenos > 1) {
+
+            const subindice = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "tspan"
+            );
+
+            subindice.textContent = String(hidrogenos);
+            subindice.setAttribute("font-size", "12");
+            subindice.setAttribute("baseline-shift", "sub");
+            subindice.setAttribute("fill", elementos.H.color);
+
+            texto.appendChild(subindice);
+        }
+    }
+
+    return texto;
 }
 
 function actualizarVista2D() {
@@ -186,10 +249,16 @@ function actualizarVista2D() {
 
     dibujo2D.innerHTML = "";
 
+    // Dibujar enlaces.
     enlaces.forEach(enlace => {
 
-        const atomoA = atomos.find(a => a.id === enlace.atomoA);
-        const atomoB = atomos.find(a => a.id === enlace.atomoB);
+        const atomoA = atomos.find(
+            a => a.id === enlace.atomoA
+        );
+
+        const atomoB = atomos.find(
+            a => a.id === enlace.atomoB
+        );
 
         if (!atomoA || !atomoB) return;
 
@@ -227,11 +296,18 @@ function actualizarVista2D() {
         }
 
         if (orden === 2) {
-            desplazamientos.push(-separacion / 2, separacion / 2);
+            desplazamientos.push(
+                -separacion / 2,
+                separacion / 2
+            );
         }
 
         if (orden === 3) {
-            desplazamientos.push(-separacion, 0, separacion);
+            desplazamientos.push(
+                -separacion,
+                0,
+                separacion
+            );
         }
 
         desplazamientos.forEach(desplazamiento => {
@@ -275,26 +351,9 @@ function actualizarVista2D() {
 
         if (!datos) return;
 
-        const texto = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "text"
-        );
+        const etiqueta = crearEtiquetaAtomo(atomo, datos);
 
-        texto.dataset.atomoId = atomo.id;
-
-        texto.setAttribute("x", atomo.x);
-        texto.setAttribute("y", atomo.y);
-        texto.setAttribute("fill", datos.color);
-        texto.setAttribute("font-size", "20");
-        texto.setAttribute("font-weight", "bold");
-        texto.setAttribute("text-anchor", "middle");
-        texto.setAttribute("dominant-baseline", "central");
-
-        const hidrogenos = obtenerHidrogenosImplicitos(atomo);
-        
-        texto.textContent = datos.simbolo + (hidrogenos > 0 ? "H" + hidrogenos : "");
-
-        dibujo2D.appendChild(texto);
+        dibujo2D.appendChild(etiqueta);
     });
 }
 
@@ -308,6 +367,7 @@ function actualizarInterfaz() {
     const conteo = {};
 
     atomos.forEach(atomo => {
+
         conteo[atomo.elemento] =
             (conteo[atomo.elemento] || 0) + 1;
     });
@@ -335,4 +395,4 @@ function iniciarBioBuilder() {
 }
 
 iniciarBioBuilder();
-          
+    
