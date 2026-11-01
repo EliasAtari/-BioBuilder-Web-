@@ -284,3 +284,24 @@ button.activo {
 #mensaje-inicial[hidden] {
     display: none !important;
 }
+
+#contenedor-plano2D {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#contenedor-plano2D[hidden] {
+    display: none !important;
+}
+
+#contenedor-plano2D:not([hidden]) {
+    display: block;
+}
+
+#dibujo-plano2D {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
