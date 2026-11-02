@@ -24,13 +24,17 @@ let herramientaActiva = null;
 let vistaActiva = "2D";
 
 function cambiarHerramienta(nombre) {
-
+    
     if (herramientaActiva === "agregar") {
         desactivarHerramientaAgregar();
     }
 
     if (herramientaActiva === "enlaces") {
         desactivarHerramientaEnlaces();
+    }
+
+    if (herramientaActiva === "eliminar") {
+        desactivarHerramientaEliminar();
     }
 
     herramientaActiva = nombre;
@@ -41,6 +45,10 @@ function cambiarHerramienta(nombre) {
 
     if (nombre === "enlaces") {
         activarHerramientaEnlaces();
+    }
+
+    if (nombre === "eliminar") {
+        activarHerramientaEliminar();
     }
 
     actualizarBotonesHerramientas();
@@ -70,13 +78,16 @@ botonAgregar.addEventListener("click", () => {
 
 botonEnlace.addEventListener("click", () => {
     cambiarHerramienta("enlaces");
+
+    estado.textContent =
+        "Crea un enlace simple, doble y triple, selecciona 2 atomos"
 });
 
 botonEliminar.addEventListener("click", () => {
     cambiarHerramienta("eliminar");
 
     estado.textContent =
-        "La herramienta Eliminar todavía no está implementada.";
+        "Selecciona un atomo para eliminarlo.";
 });
 
 function cambiarVista(modo) {
@@ -144,6 +155,11 @@ dibujo2D.addEventListener("click", (evento) => {
 
             seleccionarAtomoParaEnlace(id);
 
+        if (herramientaActiva === "eliminar") {
+
+            seleccionarAtomoParaEliminar(id);
+        }
+            
             actualizarInterfaz();
             actualizarVista2D();
         }
@@ -249,7 +265,6 @@ function actualizarVista2D() {
 
     dibujo2D.innerHTML = "";
 
-    // Dibujar enlaces.
     enlaces.forEach(enlace => {
 
         const atomoA = atomos.find(
