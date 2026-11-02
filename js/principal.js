@@ -141,7 +141,7 @@ function obtenerCoordenadas(evento) {
 }
 
 dibujo2D.addEventListener("click", (evento) => {
-
+    
     if (vistaActiva !== "2D") return;
 
     const atomoSeleccionado =
@@ -149,20 +149,20 @@ dibujo2D.addEventListener("click", (evento) => {
 
     if (atomoSeleccionado) {
 
-        const id = Number(atomoSeleccionado.dataset.atomoId);
+        const id = Number(
+            atomoSeleccionado.dataset.atomoId
+        );
 
         if (herramientaActiva === "enlaces") {
-
             seleccionarAtomoParaEnlace(id);
+        }
 
-        if (herramientaActiva === "eliminar") {
-
+        else if (herramientaActiva === "eliminar") {
             seleccionarAtomoParaEliminar(id);
         }
-            
-            actualizarInterfaz();
-            actualizarVista2D();
-        }
+
+        actualizarInterfaz();
+        actualizarVista2D();
 
         return;
     }
