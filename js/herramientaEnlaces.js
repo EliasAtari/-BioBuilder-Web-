@@ -39,22 +39,44 @@ function seleccionarAtomoParaEnlace(id) {
 }
 
 function crearEnlaceCovalente(atomoA, atomoB) {
-
-    const datosA = elementos[atomoA.elemento];
+        const datosA = elementos[atomoA.elemento];
     const datosB = elementos[atomoB.elemento];
 
     if (!datosA || !datosB) return;
 
-    const enlaceExistente = enlaces.find(enlace =>
+    const indiceEnlace = enlaces.findIndex(enlace =>
         (enlace.atomoA === atomoA.id && enlace.atomoB === atomoB.id) ||
         (enlace.atomoA === atomoB.id && enlace.atomoB === atomoA.id)
     );
 
-    const ordenActual = enlaceExistente
-        ? enlaceExistente.orden
-        : 0;
+    if (indiceEnlace !== -1) {
 
-    const nuevoOrden = ordenActual + 1;
+        const enlace = enlaces[indiceEnlace];
+
+        if (enlace.orden === 3) {
+
+            enlaces.splice(indiceEnlace, 1);
+
+            console.log("Enlace eliminado.");
+            return;
+        }
+
+        const valenciaA = obtenerValenciaUsada(atomoA.id);
+        const valenciaB = obtenerValenciaUsada(atomoB.id);
+
+        if (
+            valenciaA + 1 > datosA.valenciaMaxima ||
+            valenciaB + 1 > datosB.valenciaMaxima
+        ) {
+            console.warn("Se alcanzó el límite de valencia.");
+            return;
+        }
+
+        enlace.orden++;
+
+        console.log("Orden del enlace:", enlace.orden);
+        return;
+    }
 
     const valenciaA = obtenerValenciaUsada(atomoA.id);
     const valenciaB = obtenerValenciaUsada(atomoB.id);
@@ -63,36 +85,17 @@ function crearEnlaceCovalente(atomoA, atomoB) {
         valenciaA + 1 > datosA.valenciaMaxima ||
         valenciaB + 1 > datosB.valenciaMaxima
     ) {
-        console.warn(
-            "No se puede aumentar el enlace: un átomo alcanzó su límite de valencia."
-        );
+        console.warn("No se puede crear el enlace: límite de valencia alcanzado.");
         return;
     }
 
-    if (!enlaceExistente) {
+    enlaces.push({
+        atomoA: atomoA.id,
+        atomoB: atomoB.id,
+        orden: 1
+    });
 
-        enlaces.push({
-            atomoA: atomoA.id,
-            atomoB: atomoB.id,
-            orden: 1
-        });
-
-        console.log("Enlace simple creado.");
-        return;
-    }
-
-    if (nuevoOrden <= configuracionMolecular.enlaceMaximo) {
-
-        enlaceExistente.orden = nuevoOrden;
-
-        console.log(
-            `Enlace actualizado a orden ${nuevoOrden}.`
-        );
-
-    } else {
-
-        console.warn("El enlace ya alcanzó su orden máximo.");
-    }
+    console.log("Enlace simple creado.");
 }
 
 function obtenerValenciaUsada(idAtomo) {
