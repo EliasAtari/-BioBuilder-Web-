@@ -78,10 +78,7 @@ function iniciar() {
 
         escena.add(cuadricula);
 
-        const ejes = new THREE.AxesHelper(3);
-        escena.add(ejes);
-
-        observador = new ResizeObserver(ajustarTamaño);
+        observador = new sizeObserver(ajustarTamaño);
         observador.observe(contenedor);
 
         ajustarTamaño();
