@@ -397,14 +397,29 @@ function actualizarInterfaz() {
         .join("") || "—";
 }
 
-function iniciarBioBuilder() {
-
+async function iniciarBioBuilder() {
+    
     cambiarVista("2D");
 
     actualizarInterfaz();
     actualizarVista2D();
 
     estado.textContent = "Sistema preparado";
+
+    try {
+        await gestorLogros.iniciar();
+
+        estado.textContent = "Sistema preparado";
+        console.log("Catálogo de logros cargado correctamente.");
+
+    } catch (error) {
+        estado.textContent = "Error al cargar los logros.";
+
+        alert(
+            "No se pudo iniciar el sistema de logros:\n" +
+            error.message
+        );
+    }
 
     console.log("BioBuilder WEB 2.1 iniciado.");
 }
