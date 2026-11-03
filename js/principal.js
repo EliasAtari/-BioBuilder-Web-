@@ -125,7 +125,7 @@ function cambiarVista(modo) {
 
             motor3D.iniciar();
             motor3D.ajustarTamaño();
-            motor3D.renderizar();
+            motor3D.sincronizarAtomos();
 
             estado.textContent = "Vista 3D preparada";
 
