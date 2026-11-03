@@ -69,7 +69,8 @@ function colocarAtomo(x, y) {
         elemento: elementoSeleccionado,
 
         x: x,
-        y: y
+        y: y,
+        z: 0
 
     };
 
