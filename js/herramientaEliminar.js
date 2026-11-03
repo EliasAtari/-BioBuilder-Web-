@@ -34,4 +34,7 @@ function seleccionarAtomoParaEliminar(id) {
     atomos.splice(indiceAtomo, 1);
 
     console.log("Átomo eliminado:", id);
+
+if (typeof actualizarVista3D === "function")
+    actualizarVista3D()
 }
