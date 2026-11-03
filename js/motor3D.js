@@ -139,6 +139,7 @@ function iniciar() {
     return {
         iniciar,
         renderizar,
+        ajustarTamaño,
         iniciarAnimacion,
         detenerAnimacion
     };
