@@ -309,3 +309,19 @@ button.activo {
     height: 100%;
     display: block;
 }
+
+#contenedor-3D {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#contenedor-3D[hidden] {
+    display: none !important;
+}
+
+#contenedor-3D:not([hidden]) {
+    display: block;
+}
