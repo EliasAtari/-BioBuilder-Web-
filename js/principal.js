@@ -10,6 +10,7 @@ const boton3D = document.getElementById("modo-3d");
 
 const visor = document.getElementById("visor");
 const contenedor2D = document.getElementById("contenedor-plano2D");
+const contenedor3D = document.getElementById("contenedor-3D");
 const dibujo2D = document.getElementById("dibujo-plano2D");
 
 const mensajeInicial = document.getElementById("mensaje-inicial");
@@ -91,12 +92,14 @@ botonEliminar.addEventListener("click", () => {
 });
 
 function cambiarVista(modo) {
-
+    
     if (modo === "2D") {
 
         vistaActiva = "2D";
 
         contenedor2D.hidden = false;
+        contenedor3D.hidden = true;
+
         boton2D.classList.add("activo");
         boton3D.classList.remove("activo");
 
@@ -104,18 +107,38 @@ function cambiarVista(modo) {
 
         actualizarVista2D();
 
-    } else {
+        estado.textContent = "Vista 2D preparada";
+
+    } else if (modo === "3D") {
 
         vistaActiva = "3D";
 
         contenedor2D.hidden = true;
+        contenedor3D.hidden = false;
+
         boton3D.classList.add("activo");
         boton2D.classList.remove("activo");
 
         vistaActual.textContent = "Vista 3D";
 
-        estado.textContent =
-            "El módulo de visualización 3D está pendiente.";
+        try {
+
+            motor3D.iniciar();
+            motor3D.ajustarTamaño();
+            motor3D.renderizar();
+
+            estado.textContent = "Vista 3D preparada";
+
+        } catch (error) {
+
+            estado.textContent = "Error al iniciar la vista 3D.";
+
+            alert(
+                "No se pudo iniciar el motor 3D:\n" +
+                error.message
+            );
+
+        }
     }
 }
 
