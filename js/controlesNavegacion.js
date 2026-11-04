@@ -15,6 +15,28 @@ const controlesNavegacion = {
         zoom: true,
         desplazamiento: true,
         rotacion: true
+    },
+
+    detectarDispositivo() {
+        return window.matchMedia(
+            "(pointer: coarse)"
+            ).matches ? "movil" : "computadora";
+
+    },
+
+    obtenerConfiguracion() {
+
+    if(this.dispositivo === "automatico") {
+        return
+        this[this.detectarDispositivo()];
     }
 
+    return
+        this[this.dispositivo];
+    }
 };
+
+console.log("Controles de navegación:",
+
+            controlesNavegacion.detectarDispositivo()
+            );
