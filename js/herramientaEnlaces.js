@@ -4,6 +4,17 @@
 let herramientaEnlacesActiva = false;
 let primerAtomoSeleccionado = null;
 
+function actualizarVistasEnlaces() {
+
+    if (typeof actualizarVista2D === "function") {
+        actualizarVista2D();
+    }
+
+    if (typeof actualizarVista3D === "function") {
+        actualizarVista3D();
+    }
+}
+
 function activarHerramientaEnlaces() {
     herramientaEnlacesActiva = true;
     primerAtomoSeleccionado = null;
@@ -56,6 +67,8 @@ function crearEnlaceCovalente(atomoA, atomoB) {
         if (enlace.orden === 3) {
 
             enlaces.splice(indiceEnlace, 1);
+            
+            actualizarVistasEnlaces();
 
             console.log("Enlace eliminado.");
             return;
@@ -73,6 +86,8 @@ function crearEnlaceCovalente(atomoA, atomoB) {
         }
 
         enlace.orden++;
+        
+        actualizarVistasEnlaces();
 
         console.log("Orden del enlace:", enlace.orden);
         return;
@@ -94,6 +109,8 @@ function crearEnlaceCovalente(atomoA, atomoB) {
         atomoB: atomoB.id,
         orden: 1
     });
+
+    actualizarVistasEnlaces();
 
     console.log("Enlace simple creado.");
 }
