@@ -10,7 +10,7 @@ const motor3D = (() => {
     let contenedor = null;
 
     const esferasAtomos = new Map();
-    const grupoEnlaces = new Map();
+    const gruposEnlaces = new Map();
 
     const escala = 0.01;
     const radioAtomo = 0.35;
