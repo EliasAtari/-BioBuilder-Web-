@@ -109,4 +109,8 @@ const mundoMolecular = {
         x: Math.floor(x / tamaño),
         y: Math.floor(y / tamaño),
         z: Math.floor(z / tamaño)
-    }
+    };
+
+  }
+    
+};
