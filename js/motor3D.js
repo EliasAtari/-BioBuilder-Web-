@@ -11,6 +11,8 @@ const motor3D = (() => {
 
     const esferasAtomos = new Map();
     const gruposEnlaces = new Map();
+    const raycaster = new THREE.Raycaster();
+    const puntero = new THREE.Vector2();
 
     const escala = 0.01;
     const radioAtomo = 0.35;
@@ -54,8 +56,11 @@ const motor3D = (() => {
         renderizador.domElement.style.width = "100%";
         renderizador.domElement.style.height = "100%";
         renderizador.domElement.style.display = "block";
-
-        contenedor.appendChild(renderizador.domElement);
+        
+        renderizador.domElement.addEventListener(
+            "pointerdown",
+            seleccionarAtomo3D
+            );
 
         escena.add(new THREE.AmbientLight(0xffffff, 1.5));
 
@@ -305,12 +310,59 @@ function sincronizarEnlaces() {
         renderizador.render(escena, camara);
     }
 
+    function seleccionarAtomo3D(evento) {
+
+    if (typeof vistaActiva !== "undefined" &&
+        vistaActiva !== "3D") return;
+
+    if (!renderizador || !camara) return;
+
+    const rect = renderizador.domElement.getBoundingClientRect();
+
+    puntero.x = (
+        (evento.clientX - rect.left) / rect.width
+    ) * 2 - 1;
+
+    puntero.y = -(
+        (evento.clientY - rect.top) / rect.height
+    ) * 2 + 1;
+
+    raycaster.setFromCamera(puntero, camara);
+
+    const intersecciones = raycaster.intersectObjects(
+        Array.from(esferasAtomos.values()),
+        false
+    );
+
+    if (intersecciones.length === 0) return;
+
+    const esferaSeleccionada = intersecciones[0].object;
+    const idAtomo = esferaSeleccionada.userData.atomoId;
+
+    if (typeof herramientaActiva === "undefined") return;
+
+    if (herramientaActiva === "enlaces") {
+        seleccionarAtomoParaEnlace(idAtomo);
+    }
+
+    else if (herramientaActiva === "eliminar") {
+        seleccionarAtomoParaEliminar(idAtomo);
+    }
+
+    if (typeof actualizarInterfaz === "function") {
+        actualizarInterfaz();
+    }
+
+    sincronizarAtomos();
+    }
+    
     return {
         iniciar,
         renderizar,
         ajustarTamaño,
         sincronizarAtomos,
-        sincronizarEnlaces
+        sincronizarEnlaces,
+        seleccionarAtomo3D
     };
 
 })();
