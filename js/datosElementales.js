@@ -84,5 +84,29 @@ let siguienteId = 1;
 
 const configuracionMolecular = {
     enlaceMaximo: 3,
-    radioAtomo2D: 15
-};
+    radioAtomo2D: 15,
+
+    mundo: {
+        tamañoSector: 32,
+        coordenadaInicialX: 0,
+        coordenadaInicialY: 0,
+        coordenadaInicialZ: 0
+},
+    zoom: {
+        minimo: 0.25,
+        maximo: 4,
+        inicial: 1,
+        velocidad: 0.1
+    }
+
+const mundoMolecular = {
+
+    obtenerSector(x, y, z = 0) {
+
+    const tamaño = configuracionMolecular.mundo.tamañoSector;
+
+    return {
+        x: Math.floor(x / tamaño),
+        y: Math.floor(y / tamaño),
+        z: Math.floor(z / tamaño)
+    }
