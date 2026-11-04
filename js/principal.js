@@ -23,6 +23,12 @@ const vistaActual = document.getElementById("vista-actual");
 
 let herramientaActiva = null;
 let vistaActiva = "2D";
+let camara2D = {
+    x: 0,
+    y: 0,
+    zoom: 1,
+    inicializada: false
+};
 
 function cambiarHerramienta(nombre) {
     
@@ -151,15 +157,25 @@ boton3D.addEventListener("click", () => {
 });
 
 function obtenerCoordenadas(evento) {
+    
+    const punto = dibujo2D.createSVGPoint();
 
-    const rectangulo = dibujo2D.getBoundingClientRect();
+    punto.x = evento.clientX;
+    punto.y = evento.clientY;
 
-    const ancho = dibujo2D.viewBox.baseVal.width;
-    const alto = dibujo2D.viewBox.baseVal.height;
+    const matriz = dibujo2D.getScreenCTM();
+
+    if (!matriz) {
+        throw new Error("No se pudo obtener la transformación del SVG.");
+    }
+
+    const coordenadas = punto.matrixTransform(
+        matriz.inverse()
+    );
 
     return {
-        x: (evento.clientX - rectangulo.left) * (ancho / rectangulo.width),
-        y: (evento.clientY - rectangulo.top) * (alto / rectangulo.height)
+        x: coordenadas.x,
+        y: coordenadas.y
     };
 }
 
@@ -209,7 +225,9 @@ function obtenerHidrogenosImplicitos(atomo) {
     const valenciasPermitidas = {
         C: 4,
         N: 3,
-        O: 2
+        O: 2,
+        S: 2,
+        P: 3
     };
 
     const valenciaObjetivo =
@@ -277,6 +295,33 @@ function crearEtiquetaAtomo(atomo, datos) {
     return texto;
 }
 
+function actualizarCamara2D() {
+
+    const ancho = dibujo2D.clientWidth;
+    const alto = dibujo2D.clientHeight;
+
+    if (ancho <= 0 || alto <= 0) return;
+
+    if (!camara2D.inicializada) {
+
+        camara2D.x = ancho / 2;
+        camara2D.y = alto / 2;
+
+        camara2D.inicializada = true;
+    }
+
+    const anchoVisible = ancho / camara2D.zoom;
+    const altoVisible = alto / camara2D.zoom;
+
+    const izquierda = camara2D.x - anchoVisible / 2;
+    const arriba = camara2D.y - altoVisible / 2;
+
+    dibujo2D.setAttribute(
+        "viewBox",
+        `${izquierda} ${arriba} ${anchoVisible} ${altoVisible}`
+    );
+}
+
 function actualizarVista2D() {
 
     const ancho = dibujo2D.clientWidth;
@@ -284,7 +329,7 @@ function actualizarVista2D() {
 
     if (ancho === 0 || alto === 0) return;
 
-    dibujo2D.setAttribute("viewBox", `0 0 ${ancho} ${alto}`);
+    actualizarCamara2D();
 
     dibujo2D.innerHTML = "";
 
