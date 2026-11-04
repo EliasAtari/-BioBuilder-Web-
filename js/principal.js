@@ -27,7 +27,9 @@ let camara2D = {
     x: 0,
     y: 0,
     zoom: 1,
-    inicializada: false
+    inicializada: false,
+    anchoBase: 0,
+    altoBase: 0
 };
 
 const controles2D = {
@@ -316,8 +318,13 @@ function actualizarCamara2D() {
     if (ancho <= 0 || alto <= 0) return;
 
     if (!camara2D.inicializada) {
+        
+        camara2D.anchoBase = ancho;
+        camara2D.altoBase = alto;
+
         camara2D.x = ancho / 2;
         camara2D.y = alto / 2;
+      
         camara2D.inicializada = true;
     }
 
