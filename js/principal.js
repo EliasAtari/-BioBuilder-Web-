@@ -30,6 +30,19 @@ let camara2D = {
     inicializada: false
 };
 
+const controles2D = {
+    minimoZoom: 0.25,
+    maximoZoom: 5,
+    arrastrando: false,
+    punteroX: 0,
+    punteroY: 0,
+    distanciaInicial: 0,
+    zoomInicial: 1,
+    centroInicialX: 0,
+    centroInicialY: 0,
+    moviendo: false
+};
+
 function cambiarHerramienta(nombre) {
     
     if (herramientaActiva === "agregar") {
@@ -296,17 +309,15 @@ function crearEtiquetaAtomo(atomo, datos) {
 }
 
 function actualizarCamara2D() {
-
+    
     const ancho = dibujo2D.clientWidth;
     const alto = dibujo2D.clientHeight;
 
     if (ancho <= 0 || alto <= 0) return;
 
     if (!camara2D.inicializada) {
-
         camara2D.x = ancho / 2;
         camara2D.y = alto / 2;
-
         camara2D.inicializada = true;
     }
 
