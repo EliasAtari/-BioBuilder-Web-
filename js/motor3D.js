@@ -65,10 +65,6 @@ const motor3D = (() => {
         luzPrincipal.position.set(5, 8, 5);
         escena.add(luzPrincipal);
 
-        const cuadricula = new THREE.GridHelper(
-            20, 20, 0x00c8f0, 0x29435a
-        );
-
         escena.add(cuadricula);
 
         observador = new ResizeObserver(ajustarTamaño);
