@@ -98,6 +98,7 @@ const configuracionMolecular = {
         inicial: 1,
         velocidad: 0.1
     }
+};
 
 const mundoMolecular = {
 
