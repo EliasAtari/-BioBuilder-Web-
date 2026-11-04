@@ -10,6 +10,7 @@ const motor3D = (() => {
     let contenedor = null;
 
     const esferasAtomos = new Map();
+    const grupoEnlaces = new Map();
 
     const escala = 0.01;
     const radioAtomo = 0.35;
@@ -140,7 +141,122 @@ const motor3D = (() => {
             (atomo.z || 0) * escala
         );
     }
+    
+    function limpiarEnlaces3D() {
+    for (const grupo of gruposEnlaces.values()) {
+        escena.remove(grupo);
 
+        grupo.traverse(objeto => {
+            if (objeto.isMesh) {
+                objeto.geometry.dispose();
+                objeto.material.dispose();
+            }
+        });
+    }
+
+    gruposEnlaces.clear();
+}
+
+function crearCilindroEnlace(posicionA, posicionB, desplazamiento) {
+
+    const direccion = new THREE.Vector3()
+        .subVectors(posicionB, posicionA);
+
+    const longitud = direccion.length();
+
+    if (longitud === 0) return null;
+
+    direccion.normalize();
+
+    const geometria = new THREE.CylinderGeometry(
+        0.055, 0.055, 1, 12
+    );
+
+    const material = new THREE.MeshStandardMaterial({
+        color: "#b9d5e8",
+        roughness: 0.4
+    });
+
+    const cilindro = new THREE.Mesh(geometria, material);
+
+    const centro = new THREE.Vector3()
+        .addVectors(posicionA, posicionB)
+        .multiplyScalar(0.5);
+
+    centro.add(desplazamiento);
+
+    cilindro.position.copy(centro);
+    cilindro.scale.y = longitud;
+
+    cilindro.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        direccion
+    );
+
+    return cilindro;
+}
+
+function sincronizarEnlaces() {
+
+    if (!escena || typeof enlaces === "undefined") return;
+
+    limpiarEnlaces3D();
+
+    enlaces.forEach(enlace => {
+
+        const esferaA = esferasAtomos.get(enlace.atomoA);
+        const esferaB = esferasAtomos.get(enlace.atomoB);
+
+        if (!esferaA || !esferaB) return;
+
+        const posicionA = esferaA.position.clone();
+        const posicionB = esferaB.position.clone();
+
+        const direccion = new THREE.Vector3()
+            .subVectors(posicionB, posicionA)
+            .normalize();
+        
+        const referencia = Math.abs(direccion.y) < 0.9
+            ? new THREE.Vector3(0, 1, 0)
+            : new THREE.Vector3(1, 0, 0);
+
+        const perpendicular = new THREE.Vector3()
+            .crossVectors(direccion, referencia)
+            .normalize();
+
+        const grupo = new THREE.Group();
+
+        const separacion = 0.13;
+        const orden = Math.max(1, Math.min(3, enlace.orden));
+
+        for (let i = 0; i < orden; i++) {
+
+            const desplazamiento =
+                (i - (orden - 1) / 2) * separacion;
+
+            const offset = perpendicular.clone()
+                .multiplyScalar(desplazamiento);
+
+            const cilindro = crearCilindroEnlace(
+                posicionA,
+                posicionB,
+                offset
+            );
+
+            if (cilindro) grupo.add(cilindro);
+        }
+
+        escena.add(grupo);
+
+        const clave = [
+            Math.min(enlace.atomoA, enlace.atomoB),
+            Math.max(enlace.atomoA, enlace.atomoB)
+        ].join("-");
+
+        gruposEnlaces.set(clave, grupo);
+    });
+}
+    
     function sincronizarAtomos() {
 
         if (!escena || typeof atomos === "undefined") return;
@@ -177,7 +293,8 @@ const motor3D = (() => {
 
             posicionarEsfera(esfera, atomo);
         });
-
+        
+        sincronizarEnlaces();
         renderizar();
     }
 
@@ -192,7 +309,8 @@ const motor3D = (() => {
         iniciar,
         renderizar,
         ajustarTamaño,
-        sincronizarAtomos
+        sincronizarAtomos,
+        sincronizarEnlaces
     };
 
 })();
