@@ -8,12 +8,12 @@ const motor3D = (() => {
     let renderizador = null;
     let observador = null;
     let contenedor = null;
+    let raycaster = null;
+    let puntero = null;
 
     const esferasAtomos = new Map();
     const gruposEnlaces = new Map();
-    const raycaster = new THREE.Raycaster();
-    const puntero = new THREE.Vector2();
-
+    
     const escala = 0.01;
     const radioAtomo = 0.35;
 
@@ -56,7 +56,8 @@ const motor3D = (() => {
         renderizador.domElement.style.width = "100%";
         renderizador.domElement.style.height = "100%";
         renderizador.domElement.style.display = "block";
-        
+
+        contenedor.appendChild(renderizador.domElement);
         renderizador.domElement.addEventListener(
             "pointerdown",
             seleccionarAtomo3D
@@ -127,24 +128,23 @@ const motor3D = (() => {
     }
 
     function posicionarEsfera(esfera, atomo) {
-
-        const dibujo = document.getElementById(
-            "dibujo-plano2D"
+        
+    if (typeof camara2D === "undefined" ||
+        !camara2D.anchoBase ||
+        !camara2D.altoBase) {
+        throw new Error(
+            "No se han inicializado las dimensiones del mundo molecular."
         );
+    }
 
-        const ancho = dibujo
-            ? dibujo.viewBox.baseVal.width
-            : 0;
+    const ancho = camara2D.anchoBase;
+    const alto = camara2D.altoBase;
 
-        const alto = dibujo
-            ? dibujo.viewBox.baseVal.height
-            : 0;
-
-        esfera.position.set(
-            (atomo.x - ancho / 2) * escala,
-            (alto / 2 - atomo.y) * escala,
-            (atomo.z || 0) * escala
-        );
+    esfera.position.set(
+        (atomo.x - ancho / 2) * escala,
+        (alto / 2 - atomo.y) * escala,
+        (atomo.z || 0) * escala
+      );
     }
     
     function limpiarEnlaces3D() {
@@ -376,3 +376,4 @@ window.iniciarMotor3D = function () {
 window.actualizarVista3D = function () {
     motor3D.sincronizarAtomos();
 };
+            
