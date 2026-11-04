@@ -65,8 +65,6 @@ const motor3D = (() => {
         luzPrincipal.position.set(5, 8, 5);
         escena.add(luzPrincipal);
 
-        escena.add(cuadricula);
-
         observador = new ResizeObserver(ajustarTamaño);
         observador.observe(contenedor);
 
