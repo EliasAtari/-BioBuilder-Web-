@@ -35,14 +35,12 @@ let camara2D = {
 const controles2D = {
     minimoZoom: 0.25,
     maximoZoom: 5,
+    punteros: new Map(),
     arrastrando: false,
-    punteroX: 0,
-    punteroY: 0,
+    moviendo: false,
+    bloquearClick: false,
     distanciaInicial: 0,
-    zoomInicial: 1,
-    centroInicialX: 0,
-    centroInicialY: 0,
-    moviendo: false
+    zoomInicial: 1
 };
 
 function cambiarHerramienta(nombre) {
@@ -198,6 +196,13 @@ dibujo2D.addEventListener("click", (evento) => {
     
     if (vistaActiva !== "2D") return;
 
+        if (evento.button !== 0) return;
+
+    if (controles2D.bloquearClick) {
+        controles2D.bloquearClick = false;
+        return;
+    }
+
     const atomoSeleccionado =
         evento.target.closest("[data-atomo-id]");
 
@@ -340,6 +345,239 @@ function actualizarCamara2D() {
     );
 }
 
+dibujo2D.style.touchAction = "none";
+
+function calcularDistanciaPunteros(a, b) {
+
+    return Math.hypot(
+        b.x - a.x,
+        b.y - a.y
+    );
+}
+
+function calcularCentroPunteros(a, b) {
+
+    return {
+        x: (a.x + b.x) / 2,
+        y: (a.y + b.y) / 2
+    };
+}
+
+dibujo2D.addEventListener("wheel", (evento) => {
+
+    if (vistaActiva !== "2D") return;
+
+    evento.preventDefault();
+
+    const antes = obtenerCoordenadas(evento);
+
+    const factor = evento.deltaY < 0 ? 1.1 : 0.9;
+
+    camara2D.zoom = Math.max(
+        controles2D.minimoZoom,
+        Math.min(
+            controles2D.maximoZoom,
+            camara2D.zoom * factor
+        )
+    );
+
+    actualizarCamara2D();
+
+    const despues = obtenerCoordenadas(evento);
+
+    camara2D.x += antes.x - despues.x;
+    camara2D.y += antes.y - despues.y;
+
+    actualizarCamara2D();
+    actualizarVista2D();
+
+}, { passive: false });
+
+
+dibujo2D.addEventListener("pointerdown", (evento) => {
+
+    if (vistaActiva !== "2D") return;
+
+    if (evento.pointerType === "mouse" &&
+        evento.button !== 0 &&
+        evento.button !== 1 &&
+        evento.button !== 2) return;
+
+    controles2D.bloquearClick = false;
+
+    controles2D.punteros.set(evento.pointerId, {
+        x: evento.clientX,
+        y: evento.clientY,
+        inicioX: evento.clientX,
+        inicioY: evento.clientY
+    });
+
+    if (controles2D.punteros.size === 1) {
+
+        controles2D.arrastrando = false;
+        controles2D.moviendo = false;
+
+    }
+
+    if (controles2D.punteros.size === 2) {
+
+        const [a, b] = controles2D.punteros.values();
+
+        controles2D.distanciaInicial =
+            calcularDistanciaPunteros(a, b);
+
+        controles2D.zoomInicial = camara2D.zoom;
+
+        controles2D.arrastrando = true;
+        controles2D.moviendo = true;
+    }
+
+});
+
+
+dibujo2D.addEventListener("pointermove", (evento) => {
+
+    if (vistaActiva !== "2D") return;
+
+    const actual = controles2D.punteros.get(
+        evento.pointerId
+    );
+
+    if (!actual) return;
+
+    const anterior = {
+        x: actual.x,
+        y: actual.y
+    };
+
+    actual.x = evento.clientX;
+    actual.y = evento.clientY;
+
+    if (controles2D.punteros.size === 1) {
+
+        const dx = actual.x - anterior.x;
+        const dy = actual.y - anterior.y;
+
+        const distanciaMovimiento = Math.hypot(
+            actual.x - actual.inicioX,
+            actual.y - actual.inicioY
+        );
+
+        if (distanciaMovimiento > 3) {
+
+            controles2D.arrastrando = true;
+            controles2D.moviendo = true;
+        }
+
+        if (!controles2D.arrastrando) return;
+
+        camara2D.x -= dx / camara2D.zoom;
+        camara2D.y -= dy / camara2D.zoom;
+
+        actualizarCamara2D();
+
+        return;
+    }
+
+    if (controles2D.punteros.size === 2) {
+
+        const entradas = [...controles2D.punteros.entries()];
+
+        const [idA, a] = entradas[0];
+        const [idB, b] = entradas[1];
+
+        const distanciaNueva =
+            calcularDistanciaPunteros(a, b);
+
+        if (controles2D.distanciaInicial <= 0) return;
+
+        const centroAnterior = calcularCentroPunteros(
+            idA === evento.pointerId ? anterior : a,
+            idB === evento.pointerId ? anterior: b
+        );
+
+        const centroNuevo = calcularCentroPunteros(a, b);
+
+        const coordenadasAntes = obtenerCoordenadas({
+            clientX: centroAnterior.x,
+            clientY: centroAnterior.y
+        });
+
+        const factor =
+            distanciaNueva / controles2D.distanciaInicial;
+
+        camara2D.zoom = Math.max(
+            controles2D.minimoZoom,
+            Math.min(
+                controles2D.maximoZoom,
+                controles2D.zoomInicial * factor
+            )
+        );
+
+        actualizarCamara2D();
+
+        const coordenadasDespues = obtenerCoordenadas({
+            clientX: centroNuevo.x,
+            clientY: centroNuevo.y
+        });
+
+        camara2D.x +=
+            coordenadasAntes.x - coordenadasDespues.x;
+
+        camara2D.y +=
+            coordenadasAntes.y - coordenadasDespues.y;
+
+        actualizarCamara2D();
+
+    }
+
+});
+
+function finalizarPuntero2D(evento) {
+
+    if (!controles2D.punteros.has(evento.pointerId)) return;
+
+    controles2D.punteros.delete(evento.pointerId);
+
+    if (controles2D.moviendo) {
+        controles2D.bloquearClick = true;
+    }
+
+    if (controles2D.punteros.size === 0) {
+
+        controles2D.arrastrando = false;
+        controles2D.moviendo = false;
+
+    }
+
+    if (controles2D.punteros.size === 1) {
+
+        const restante =
+            controles2D.punteros.values().next().value;
+
+        restante.inicioX = restante.x;
+        restante.inicioY = restante.y;
+
+        controles2D.arrastrando = false;
+        controles2D.moviendo = false;
+    }
+
+}
+
+dibujo2D.addEventListener(
+    "pointerup",
+    finalizarPuntero2D
+);
+
+dibujo2D.addEventListener(
+    "pointercancel",
+    finalizarPuntero2D
+);
+
+dibujo2D.addEventListener("contextmenu", (evento) => {
+    evento.preventDefault();
+});
+    
 function actualizarVista2D() {
 
     const ancho = dibujo2D.clientWidth;
