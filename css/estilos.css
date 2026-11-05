@@ -309,7 +309,7 @@ button.activo {
     user-select: none;
 }
 
-#contenedor-3D canvas {
+#contenedor-3D {
     display: block;
     width: 100%;
     height: 100%;
