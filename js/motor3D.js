@@ -57,7 +57,7 @@ const motor3D = (() => {
 
         objetivoCamara = new THREE.Vector3(0, 0, 0);
         
-        camara.position.set(12.5, 12.5, 20);
+        camara.position.set(0, 0, 20);
         camara.lookAt(objetivoCamara);
 
         renderizador = new THREE.WebGLRenderer({
