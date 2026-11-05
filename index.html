@@ -8,6 +8,7 @@
     <title>BioBuilder WEB 2026</title>
 
     <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/ajustes.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
     
@@ -121,14 +122,13 @@
 
             </main>
 
-        </div>
-
-    <section id="panel-ajustes" class="panel-ajustes" hidden>
+            
+<section id="panel-ajustes" class="panel-ajustes" hidden>
 
     <header class="encabezado-ajustes">
         <div>
-            <h2>Ajustes</h2>
-            <p>Configuración de BioBuilder WEB</p>
+            <h2>Ajustes de BioBuilder</h2>
+            <p>Personaliza tu experiencia.</p>
         </div>
 
         <button id="volver-constructor">
@@ -136,34 +136,59 @@
         </button>
     </header>
 
+    <nav class="navegacion-ajustes">
+        <button class="categoria-ajustes activo"
+                data-categoria="general">
+            General
+        </button>
+
+        <button class="categoria-ajustes"
+                data-categoria="visual">
+            Visual
+        </button>
+
+        <button class="categoria-ajustes"
+                data-categoria="soporte">
+            Soporte de errores
+        </button>
+
+        <button class="categoria-ajustes"
+                data-categoria="otros">
+            Otros
+        </button>
+    </nav>
+
     <div class="contenido-ajustes">
 
-        <section class="grupo-ajustes">
-            <h3>Apariencia</h3>
-            <p>Personalización de la interfaz.</p>
+        <section class="seccion-ajustes activa"
+                 data-seccion="general">
+            <h3>General</h3>
+            <p>Preferencias generales de BioBuilder.</p>
         </section>
 
-        <section class="grupo-ajustes">
-            <h3>Visualización</h3>
-            <p>Configuración de las vistas 2D y 3D.</p>
+        <section class="seccion-ajustes"
+                 data-seccion="visual" hidden>
+            <h3>Visual</h3>
+            <p>Personaliza la visualización molecular.</p>
         </section>
 
-        <section class="grupo-ajustes">
-            <h3>Presentación</h3>
-            <p>Información y presentación de BioBuilder.</p>
-            <button id="ver-presentacion">
-                Ver presentación
-            </button>
+        <section class="seccion-ajustes"
+                 data-seccion="soporte" hidden>
+            <h3>Soporte de errores</h3>
+            <p>¿Encontraste un error o bug?</p>
         </section>
 
-        <section class="grupo-ajustes">
-            <h3>Diagnóstico</h3>
-            <p>Información sobre errores y posibles soluciones.</p>
+        <section class="seccion-ajustes"
+                 data-seccion="otros" hidden>
+            <h3>Otros</h3>
+            <p>Otras opciones de BioBuilder.</p>
         </section>
 
     </div>
 
-        </section>
+</section>
+
+        </div>
 
 <div id="panel-cuenta" class="panel-cuenta" hidden>
 
