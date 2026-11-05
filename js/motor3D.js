@@ -29,6 +29,9 @@ const motor3D = (() => {
             throw new Error("Three.js no esta disponible.");
         }
 
+        raycaster = new THREE.Raycaster();
+        puntero = new THREE.Vector2();
+        
         if (renderizador) {
             ajustarTamaño();
             return;
