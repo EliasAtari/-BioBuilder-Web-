@@ -10,7 +10,18 @@ const motor3D = (() => {
     let contenedor = null;
     let raycaster = null;
     let puntero = null;
+    let objetivoCamara = null;
 
+    const controles3D = {
+        punteros: new Map(),
+
+        moviendo: false,
+
+        distanciaInicial: 0,
+
+        movimientoMinimo: 4
+    };
+    
     const esferasAtomos = new Map();
     const gruposEnlaces = new Map();
     
@@ -44,8 +55,10 @@ const motor3D = (() => {
             60, 1, 0.1, 1000
         );
 
+        objetivoCamara = new THREE.Vector3(0, 0, 0);
+        
         camara.position.set(5, 5, 8);
-        camara.lookAt(0, 0, 0);
+        camara.lookAt(objetivoCamara);
 
         renderizador = new THREE.WebGLRenderer({
             antialias: true,
@@ -61,10 +74,8 @@ const motor3D = (() => {
         renderizador.domElement.style.display = "block";
 
         contenedor.appendChild(renderizador.domElement);
-        renderizador.domElement.addEventListener(
-            "pointerdown",
-            seleccionarAtomo3D
-            );
+
+        configurarControles3D();
 
         escena.add(new THREE.AmbientLight(0xffffff, 1.5));
 
