@@ -25,7 +25,7 @@ const motor3D = (() => {
     const esferasAtomos = new Map();
     const gruposEnlaces = new Map();
     
-    const escala = 0.01;
+    const escala = 0.025;
     const radioAtomo = 0.35;
 
     function iniciar() {
@@ -57,7 +57,7 @@ const motor3D = (() => {
 
         objetivoCamara = new THREE.Vector3(0, 0, 0);
         
-        camara.position.set(5, 5, 8);
+        camara.position.set(12.5, 12.5, 20);
         camara.lookAt(objetivoCamara);
 
         renderizador = new THREE.WebGLRenderer({
