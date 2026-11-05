@@ -323,7 +323,258 @@ function sincronizarEnlaces() {
 
         renderizador.render(escena, camara);
     }
+    
+function configurarControles3D() {
 
+    const lienzo = renderizador.domElement;
+
+    lienzo.style.touchAction = "none";
+
+    lienzo.addEventListener("contextmenu", evento => {
+        evento.preventDefault();
+    });
+
+    lienzo.addEventListener("wheel", evento => {
+
+        if (vistaActiva !== "3D") return;
+
+        evento.preventDefault();
+
+        const factor = evento.deltaY < 0 ? 0.9 : 1.1;
+
+        camara.position
+            .sub(objetivoCamara)
+            .multiplyScalar(factor)
+            .add(objetivoCamara);
+
+        renderizar();
+
+    }, { passive: false });
+
+    lienzo.addEventListener("pointerdown", evento => {
+
+        if (vistaActiva !== "3D") return;
+
+        if (evento.pointerType === "mouse" &&
+            ![0, 1, 2].includes(evento.button)) return;
+
+        const registro = {
+            x: evento.clientX,
+            y: evento.clientY,
+            inicioX: evento.clientX,
+            inicioY: evento.clientY,
+            tipo: evento.pointerType,
+            boton: evento.button,
+            movido: false
+        };
+
+        controles3D.punteros.set(
+            evento.pointerId,
+            registro
+        );
+
+        lienzo.setPointerCapture(evento.pointerId);
+
+        if (controles3D.punteros.size === 2) {
+
+            const [a, b] = controles3D.punteros.values();
+
+            controles3D.distanciaInicial =
+                Math.hypot(b.x - a.x, b.y - a.y);
+
+            a.movido = true;
+            b.movido = true;
+        }
+
+    });
+
+    lienzo.addEventListener("pointermove", evento => {
+
+        const actual = controles3D.punteros.get(
+            evento.pointerId
+        );
+
+        if (!actual || vistaActiva !== "3D") return;
+
+        const dx = evento.clientX - actual.x;
+        const dy = evento.clientY - actual.y;
+
+        actual.x = evento.clientX;
+        actual.y = evento.clientY;
+
+        const desplazamiento = Math.hypot(
+            actual.x - actual.inicioX,
+            actual.y - actual.inicioY
+        );
+
+        if (desplazamiento >
+            controles3D.movimientoMinimo) {
+            actual.movido = true;
+        }
+
+        if (controles3D.punteros.size === 1) {
+
+            if (!actual.movido) return;
+
+            if (
+                actual.tipo === "touch" ||
+                actual.boton === 0
+            ) {
+                rotarCamara3D(dx, dy);
+            }
+
+            else {
+                desplazarCamara3D(dx, dy);
+            }
+
+        }
+
+        else if (controles3D.punteros.size === 2) {
+
+            const [a, b] =
+                controles3D.punteros.values();
+
+            const distanciaNueva = Math.hypot(
+                b.x - a.x,
+                b.y - a.y
+            );
+
+            const centroAnterior = {
+                x: (a.x + b.x - dx) / 2,
+                y: (a.y + b.y - dy) / 2
+            };
+
+            const centroNuevo = {
+                x: (a.x + b.x) / 2,
+                y: (a.y + b.y) / 2
+            };
+
+            if (controles3D.distanciaInicial > 0) {
+
+                const factor =
+                    controles3D.distanciaInicial /
+                    distanciaNueva;
+
+                camara.position
+                    .sub(objetivoCamara)
+                    .multiplyScalar(factor)
+                    .add(objetivoCamara);
+            }
+
+            desplazarCamara3D(
+                centroNuevo.x - centroAnterior.x,
+                centroNuevo.y - centroAnterior.y
+            );
+
+            controles3D.distanciaInicial = distanciaNueva;
+        }
+
+        renderizar();
+
+    });
+
+    function finalizarInteraccion(evento) {
+
+        const actual = controles3D.punteros.get(
+            evento.pointerId
+        );
+
+        if (!actual) return;
+
+        const seleccionar =
+            controles3D.punteros.size === 1 &&
+            !actual.movido &&
+            evento.pointerType !== "mouse" ||
+            (
+                controles3D.punteros.size === 1 &&
+                !actual.movido &&
+                evento.pointerType === "mouse" &&
+                evento.button === 0
+            );
+
+        controles3D.punteros.delete(evento.pointerId);
+
+        if (seleccionar) {
+            seleccionarAtomo3D(evento);
+        }
+
+        if (controles3D.punteros.size < 2) {
+            controles3D.distanciaInicial = 0;
+        }
+    }
+
+    lienzo.addEventListener(
+        "pointerup",
+        finalizarInteraccion
+    );
+
+    lienzo.addEventListener(
+        "pointercancel",
+        finalizarInteraccion
+    );
+}
+
+function rotarCamara3D(dx, dy) {
+
+    const offset = new THREE.Vector3()
+        .subVectors(camara.position, objetivoCamara);
+
+    const esferica = new THREE.Spherical()
+        .setFromVector3(offset);
+
+    const rect = renderizador.domElement
+        .getBoundingClientRect();
+
+    esferica.theta -=
+        2 * Math.PI * dx / rect.height;
+
+    esferica.phi -=
+        2 * Math.PI * dy / rect.height;
+
+    esferica.phi = Math.max(
+        0.01,
+        Math.min(Math.PI - 0.01, esferica.phi)
+    );
+
+    offset.setFromSpherical(esferica);
+
+    camara.position.copy(objetivoCamara).add(offset);
+
+    camara.lookAt(objetivoCamara);
+}
+
+function desplazarCamara3D(dx, dy) {
+
+    const rect = renderizador.domElement
+        .getBoundingClientRect();
+
+    const distancia = camara.position.distanceTo(
+        objetivoCamara
+    );
+
+    const escalaPan =
+        2 * distancia *
+        Math.tan(THREE.MathUtils.degToRad(camara.fov / 2)) /
+        rect.height;
+
+    const derecha = new THREE.Vector3()
+        .setFromMatrixColumn(camara.matrix, 0);
+
+    const arriba = new THREE.Vector3()
+        .setFromMatrixColumn(camara.matrix, 1);
+
+    const desplazamiento = derecha
+        .multiplyScalar(-dx * escalaPan)
+        .add(
+            arriba.multiplyScalar(dy * escalaPan)
+        );
+
+    camara.position.add(desplazamiento);
+    objetivoCamara.add(desplazamiento);
+
+    camara.lookAt(objetivoCamara);
+}
+    
     function seleccionarAtomo3D(evento) {
 
     if (typeof vistaActiva !== "undefined" &&
