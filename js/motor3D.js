@@ -474,34 +474,32 @@ function configurarControles3D() {
     });
 
     function finalizarInteraccion(evento) {
+        
+    const actual = controles3D.punteros.get(
+        evento.pointerId
+    );
 
-        const actual = controles3D.punteros.get(
-            evento.pointerId
+    if (!actual) return;
+
+    const seleccionar =
+        evento.type === "pointerup" &&
+        controles3D.punteros.size === 1 &&
+        !actual.movido &&
+        (
+            evento.pointerType !== "mouse" ||
+            evento.button === 0
         );
 
-        if (!actual) return;
+    controles3D.punteros.delete(evento.pointerId);
 
-        const seleccionar =
-            controles3D.punteros.size === 1 &&
-            !actual.movido &&
-            evento.pointerType !== "mouse" ||
-            (
-                controles3D.punteros.size === 1 &&
-                !actual.movido &&
-                evento.pointerType === "mouse" &&
-                evento.button === 0
-            );
-
-        controles3D.punteros.delete(evento.pointerId);
-
-        if (seleccionar) {
-            seleccionarAtomo3D(evento);
-        }
-
-        if (controles3D.punteros.size < 2) {
-            controles3D.distanciaInicial = 0;
-        }
+    if (seleccionar) {
+        seleccionarAtomo3D(evento);
     }
+
+    if (controles3D.punteros.size < 2) {
+        controles3D.distanciaInicial = 0;
+      }
+    } 
 
     lienzo.addEventListener(
         "pointerup",
