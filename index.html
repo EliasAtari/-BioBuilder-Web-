@@ -1,24 +1,25 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>BioBuilder WEB 2026</title>
-
+    
     <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="css/ajustes.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
-    
 </head>
 
 <body>
 
     <div class="aplicacion">
-
+        
         <header class="barra-superior">
+
             <div class="identidad">
                 <span class="logo">BB</span>
                 <h1>BioBuilder</h1>
@@ -29,6 +30,7 @@
                 <span id="fps">FPS: --</span>
                 <span id="estado">Sistema preparado</span>
             </div>
+
         </header>
 
         <div class="contenido">
@@ -67,6 +69,7 @@
             <main class="area-construccion">
 
                 <div class="encabezado-visor">
+
                     <div>
                         <h2>Espacio molecular</h2>
                         <span id="vista-actual">Vista 3D</span>
@@ -76,26 +79,35 @@
                         <button id="modo-2d">2D</button>
                         <button id="modo-3d">3D</button>
                     </div>
+
                 </div>
+
                 <div id="visor" class="visor-molecular">
 
-    <div id="contenedor-plano2D" hidden>
-        <svg id="dibujo-plano2D"></svg>
-    </div>
+                    <div id="contenedor-plano2D" hidden>
+                        <svg id="dibujo-plano2D"></svg>
+                    </div>
 
-    <div id="contenedor-3D" hidden>
-    </div>
+                    <div id="contenedor-3D" hidden>
+                    </div>
 
-    <div id="mensaje-inicial">
-        <h2>Espacio molecular</h2>
-        <p>
-            Aquí podrás construir y visualizar
-            tus moléculas.
-        </p>
-        <p>Selecciona una herramienta para comenzar.</p>
-    </div>
+                    <div id="mensaje-inicial">
 
-</div>
+                        <h2>Espacio molecular</h2>
+
+                        <p>
+                            Aquí podrás construir y visualizar
+                            tus moléculas.
+                        </p>
+
+                        <p>
+                            Selecciona una herramienta para comenzar.
+                        </p>
+
+                    </div>
+
+                </div>
+
                 <footer class="informacion-molecular">
 
                     <div class="dato">
@@ -122,139 +134,161 @@
 
             </main>
 
-            
-<section id="panel-ajustes" class="panel-ajustes" hidden>
+            <section id="panel-ajustes" class="panel-ajustes" hidden>
 
-    <header class="encabezado-ajustes">
-        <div>
-            <h2>Ajustes de BioBuilder</h2>
-            <p>Personaliza tu experiencia.</p>
+                <header class="encabezado-ajustes">
+
+                    <div>
+                        <h2>Ajustes de BioBuilder</h2>
+                        <p>Personaliza tu experiencia.</p>
+                    </div>
+
+                    <button id="volver-constructor">
+                        Volver al constructor
+                    </button>
+
+                </header>
+
+                <nav class="navegacion-ajustes">
+
+                    <button class="categoria-ajustes activo"
+                            data-categoria="general">
+                        General
+                    </button>
+
+                    <button class="categoria-ajustes"
+                            data-categoria="visual">
+                        Visual
+                    </button>
+
+                    <button class="categoria-ajustes"
+                            data-categoria="soporte">
+                        Soporte de errores
+                    </button>
+
+                    <button class="categoria-ajustes"
+                            data-categoria="otros">
+                        Otros
+                    </button>
+
+                </nav>
+
+                <div class="contenido-ajustes">
+
+                    <section class="seccion-ajustes activa"
+                             data-seccion="general">
+
+                        <h3>General</h3>
+                        <p>Preferencias generales de BioBuilder.</p>
+
+                    </section>
+
+                    <section class="seccion-ajustes"
+                             data-seccion="visual"
+                             hidden>
+
+                        <h3>Visual</h3>
+                        <p>Personaliza la visualización molecular.</p>
+
+                        <div class="opcion-ajuste">
+
+                            <label for="hidrogenos-pequenos">
+                                Hidrógenos pequeños
+                            </label>
+
+                            <select id="hidrogenos-pequenos">
+                                <option value="si">Sí</option>
+                                <option value="no">No</option>
+                            </select>
+
+                        </div>
+
+                        <div class="opcion-ajuste">
+
+                            <label for="calidad-grafica">
+                                Calidad gráfica
+                            </label>
+
+                            <select id="calidad-grafica">
+                                <option value="estandar">Estándar</option>
+                                <option value="sofisticado">Sofisticado</option>
+                                <option value="realista">Realista</option>
+                            </select>
+
+                        </div>
+
+                    </section>
+
+                    <section class="seccion-ajustes"
+                             data-seccion="soporte"
+                             hidden>
+
+                        <h3>Soporte de errores</h3>
+                        <p>¿Encontraste un error o bug?</p>
+
+                    </section>
+                    
+                    <section class="seccion-ajustes"
+                             data-seccion="otros"
+                             hidden>
+
+                        <h3>Otros</h3>
+                        <p>Otras opciones de BioBuilder.</p>
+
+                        <div class="opcion-ajuste">
+
+                            <h4>Presentación de BioBuilder</h4>
+
+                            <p>
+                                ¿Quieres volver a ver la presentación?
+                            </p>
+
+                            <button id="ver-bienvenida">
+                                Ver presentación
+                            </button>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            </section>
+
         </div>
 
-        <button id="volver-constructor">
-            Volver al constructor
-        </button>
-    </header>
+        <div id="panel-cuenta" class="panel-cuenta" hidden>
 
-    <nav class="navegacion-ajustes">
-        <button class="categoria-ajustes activo"
-                data-categoria="general">
-            General
-        </button>
+            <div class="encabezado-cuenta">
+                <h2>Mi Cuenta</h2>
+                <button id="cerrar-panel-cuenta">✕</button>
+            </div>
 
-        <button class="categoria-ajustes"
-                data-categoria="visual">
-            Visual
-        </button>
+            <div class="perfil-cuenta">
 
-        <button class="categoria-ajustes"
-                data-categoria="soporte">
-            Soporte de errores
-        </button>
+                <img id="foto-usuario" src="" alt="Foto de perfil">
 
-        <section class="seccion-ajustes"
-         data-seccion="otros" hidden>
+                <h3 id="nombre-usuario">Usuario</h3>
+                <p id="correo-usuario"></p>
 
-    <h3>Otros</h3>
-    <p>Otras opciones de BioBuilder.</p>
+            </div>
 
-    <div class="opcion-ajuste">
-        <h4>Presentación de BioBuilder</h4>
+            <section class="seccion-logros">
 
-        <p>¿Quieres volver a ver la presentación?</p>
+                <h3>Mis logros</h3>
 
-        <button id="ver-bienvenida">
-            Ver presentación
-        </button>
-    </div>
+                <div id="lista-logros">
+    
+                </div>
 
-        </section>
-    </nav>
+            </section>
 
-    <div class="contenido-ajustes">
-
-        <section class="seccion-ajustes activa"
-                 data-seccion="general">
-            <h3>General</h3>
-            <p>Preferencias generales de BioBuilder.</p>
-        </section>
-
-        <section class="seccion-ajustes"
-         data-seccion="visual" hidden>
-
-    <h3>Visual</h3>
-    <p>Personaliza la visualización molecular.</p>
-
-    <div class="opcion-ajuste">
-        <label for="hidrogenos-pequenos">
-            Hidrógenos pequeños
-        </label>
-
-        <select id="hidrogenos-pequenos">
-            <option value="si">Sí</option>
-            <option value="no">No</option>
-        </select>
-    </div>
-
-    <div class="opcion-ajuste">
-        <label for="calidad-grafica">
-            Calidad gráfica
-        </label>
-
-        <select id="calidad-grafica">
-            <option value="estandar">Estándar</option>
-            <option value="sofisticado">Sofisticado</option>
-            <option value="realista">Realista</option>
-        </select>
-    </div>
-
-        </section>
-        
-        <section class="seccion-ajustes"
-                 data-seccion="soporte" hidden>
-            <h3>Soporte de errores</h3>
-            <p>¿Encontraste un error o bug?</p>
-        </section>
-
-        <section class="seccion-ajustes"
-                 data-seccion="otros" hidden>
-            <h3>Otros</h3>
-            <p>Otras opciones de BioBuilder.</p>
-        </section>
-
-    </div>
-
-</section>
+            <button id="cerrar-sesion">Cerrar sesión</button>
 
         </div>
 
-<div id="panel-cuenta" class="panel-cuenta" hidden>
-
-    <div class="encabezado-cuenta">
-        <h2>Mi Cuenta</h2>
-        <button id="cerrar-panel-cuenta">✕</button>
     </div>
 
-    <div class="perfil-cuenta">
-        <img id="foto-usuario" src="" alt="Foto de perfil">
-
-        <h3 id="nombre-usuario">Usuario</h3>
-        <p id="correo-usuario"></p>
-    </div>
-
-    <section class="seccion-logros">
-        <h3>Mis logros</h3>
-
-        <div id="lista-logros">
-            <!-- Los logros se generarán con JavaScript -->
-        </div>
-    </section>
-
-    <button id="cerrar-sesion">Cerrar sesión</button>
-
-</div>
-        
-    </div>
 
     <script type="module" src="js/firebase.js"></script>
     <script type="module" src="js/herramientaCuenta.js"></script>
@@ -263,8 +297,9 @@
     <script src="js/herramientaEliminar.js"></script>
     <script src="js/herramientaEnlaces.js"></script>
     <script src="js/motor3D.js"></script>
+    <script src="js/ajustes.js"></script>
     <script src="js/principal.js"></script>
-    
 
-    </body>
-</html>
+</body>
+    </html>
+                        
