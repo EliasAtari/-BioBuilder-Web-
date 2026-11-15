@@ -710,12 +710,9 @@ function actualizarInterfaz() {
         conteo[atomo.elemento] =
             (conteo[atomo.elemento] || 0) + 1;
 
-        if (atomo.elemento === "O") {
-
             const hidrogenos = obtenerHidrogenosImplicitos(atomo);
 
             conteo.H = (conteo.H || 0) + hidrogenos;
-        }
     });
 
     const orden = ["C", "H", "O", "N", "Cl", "S", "P", "F"];
