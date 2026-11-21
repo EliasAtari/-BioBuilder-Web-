@@ -263,6 +263,39 @@ function obtenerHidrogenosImplicitos(atomo) {
     );
 }
 
+const atomosImplicitos = [];
+const enlacesImplicitos = [];
+
+function generarAtomosImplicitos() {
+
+    atomosImplicitos.length = 0;
+    enlacesImplicitos.length = 0;
+
+    atomos.forEach(atomo => {
+
+        const cantidad = obtenerHidrogenosImplicitos(atomo);
+
+        for (let i = 0; i < cantidad; i++) {
+
+            const hidrogeno = {
+                id: `H-${atomo.id}-${i}`,
+                elemento: "H",
+                atomoPadre: atomo.id,
+                tipo: "implicito"
+            };
+
+            atomosImplicitos.push(hidrogeno);
+
+            enlacesImplicitos.push({
+                atomoA: atomo.id,
+                atomoB: hidrogeno.id,
+                orden: 1,
+                tipo: "implicito"
+            });
+        }
+    });
+}
+
 function crearEtiquetaAtomo(atomo, datos) {
 
     const texto = document.createElementNS(
@@ -697,6 +730,8 @@ function actualizarVista2D() {
 }
 
 function actualizarInterfaz() {
+
+    generarAtomosImplicitos();
 
     cantidadAtomos.textContent = atomos.length;
     cantidadEnlaces.textContent = enlaces.length;
