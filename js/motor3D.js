@@ -24,6 +24,9 @@ const motor3D = (() => {
     
     const esferasAtomos = new Map();
     const gruposEnlaces = new Map();
+
+    const esferasHidrogenos = new Map();
+    const gruposEnlacesImplicitos = new Map();
     
     const escala = 0.025;
     const radioAtomo = 0.35;
@@ -141,6 +144,43 @@ const motor3D = (() => {
         return esfera;
     }
 
+    function crearEsferaHidrogeno(hidrogeno) {
+
+    const datos = elementos.H;
+
+    if (!datos) return null;
+
+    const radio = radioAtomo * obtenerEscalaHidrogeno();
+
+    const geometria = new THREE.SphereGeometry(
+        radio, 24, 18
+    );
+
+    const material = new THREE.MeshStandardMaterial({
+        color: datos.color,
+        roughness: 0.35,
+        metalness: 0.05
+    });
+
+    const esfera = new THREE.Mesh(
+        geometria,
+        material
+    );
+
+    esfera.userData.hidrogenoImplicito = true;
+
+    escena.add(esfera);
+
+    return esfera;
+    }
+
+    function obtenerEscalaHidrogeno() {
+
+    const tamaño = localStorage.getItem("bb_hidrogenos");
+
+    return tamaño === "pequeno" ? 0.55 : 1;
+    }
+    
     function posicionarEsfera(esfera, atomo) {
         
     if (typeof camara2D === "undefined" ||
@@ -160,6 +200,30 @@ const motor3D = (() => {
         (atomo.z || 0) * escala
       );
     }
+
+    function posicionarHidrogeno(esfera, hidrogeno, atomoPadre, indice, total) {
+
+    const ancho = camara2D.anchoBase;
+    const alto = camara2D.altoBase;
+
+    const angulo = (indice / total) * Math.PI * 2;
+
+    const radio = radioAtomo * 1.35;
+
+    const centroX = (atomoPadre.x - ancho / 2) * escala;
+    const centroY = (alto / 2 - atomoPadre.y) * escala;
+    const centroZ = (atomoPadre.z || 0) * escala;
+
+    const desplazamientoZ = total > 2
+        ? Math.sin(angulo) * radio * 0.7
+        : 0;
+
+    esfera.position.set(
+        centroX + Math.cos(angulo) * radio,
+        centroY + Math.sin(angulo) * radio,
+        centroZ + desplazamientoZ
+    );
+    }
     
     function limpiarEnlaces3D() {
     for (const grupo of gruposEnlaces.values()) {
@@ -176,6 +240,54 @@ const motor3D = (() => {
     gruposEnlaces.clear();
 }
 
+function limpiarEnlacesImplicitos3D() {
+
+    for (const grupo of gruposEnlacesImplicitos.values()) {
+
+        escena.remove(grupo);
+
+        grupo.traverse(objeto => {
+            if (objeto.isMesh) {
+                objeto.geometry.dispose();
+                objeto.material.dispose();
+            }
+        });
+    }
+
+    gruposEnlacesImplicitos.clear();
+}
+
+function sincronizarEnlacesImplicitos() {
+
+    if (typeof enlacesImplicitos === "undefined") return;
+
+    limpiarEnlacesImplicitos3D();
+
+    enlacesImplicitos.forEach(enlace => {
+
+        const esferaA = esferasAtomos.get(enlace.atomoA);
+        const esferaB = esferasHidrogenos.get(enlace.atomoB);
+
+        if (!esferaA || !esferaB) return;
+
+        const grupo = new THREE.Group();
+
+        const cilindro = crearCilindroEnlace(
+            esferaA.position.clone(),
+            esferaB.position.clone(),
+            new THREE.Vector3(0, 0, 0)
+        );
+
+        if (cilindro) {
+            grupo.add(cilindro);
+        }
+
+        escena.add(grupo);
+
+        gruposEnlacesImplicitos.set(enlace.atomoB, grupo);
+    });
+}
+    
 function crearCilindroEnlace(posicionA, posicionB, desplazamiento) {
 
     const direccion = new THREE.Vector3()
@@ -276,6 +388,60 @@ function sincronizarEnlaces() {
     });
 }
     
+    function sincronizarHidrogenosImplicitos() {
+
+    if (typeof atomosImplicitos === "undefined") return;
+    if (typeof atomos === "undefined") return;
+
+    const idsActuales = new Set(
+        atomosImplicitos.map(h => h.id)
+    );
+
+    for (const [id, esfera] of esferasHidrogenos) {
+
+        if (!idsActuales.has(id)) {
+
+            escena.remove(esfera);
+
+            esfera.geometry.dispose();
+            esfera.material.dispose();
+
+            esferasHidrogenos.delete(id);
+        }
+    }
+
+    atomos.forEach(atomoPadre => {
+
+        const hidrogenos = atomosImplicitos.filter(
+            h => h.atomoPadre === atomoPadre.id
+        );
+
+        hidrogenos.forEach((hidrogeno, indice) => {
+
+            let esfera = esferasHidrogenos.get(hidrogeno.id);
+
+            if (!esfera) {
+
+                esfera = crearEsferaHidrogeno(hidrogeno);
+
+                if (!esfera) return;
+
+                esferasHidrogenos.set(hidrogeno.id, esfera);
+            }
+
+            posicionarHidrogeno(
+                esfera,
+                hidrogeno,
+                atomoPadre,
+                indice,
+                hidrogenos.length
+            );
+        });
+    });
+
+    sincronizarEnlacesImplicitos();
+    }
+    
     function sincronizarAtomos() {
 
         if (!escena || typeof atomos === "undefined") return;
@@ -314,6 +480,7 @@ function sincronizarEnlaces() {
         });
         
         sincronizarEnlaces();
+        sincronizarHidrogenosImplicitos();
         renderizar();
     }
 
