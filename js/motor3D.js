@@ -639,4 +639,3 @@ window.iniciarMotor3D = function () {
 window.actualizarVista3D = function () {
     motor3D.sincronizarAtomos();
 };
-            
