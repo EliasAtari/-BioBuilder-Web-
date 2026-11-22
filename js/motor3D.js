@@ -178,7 +178,7 @@ const motor3D = (() => {
 
     const tamaño = localStorage.getItem("bb_hidrogenos");
 
-    return tamaño === "pequeno" ? 0.55 : 1;
+    return tamaño === "si" ? 0.55 : 1;
     }
     
     function posicionarEsfera(esfera, atomo) {
@@ -441,8 +441,26 @@ function sincronizarEnlaces() {
 
     sincronizarEnlacesImplicitos();
     }
+
+ function actualizarTamañoHidrogenos() {
+
+    const escalaHidrogeno = obtenerEscalaHidrogeno();
+
+    for (const esfera of esferasHidrogenos.values()) {
+
+        esfera.geometry.dispose();
+
+        esfera.geometry = new THREE.SphereGeometry(
+            radioAtomo * escalaHidrogeno,
+            24,
+            18
+        );
+    }
+
+    renderizar();
+ }
     
-    function sincronizarAtomos() {
+function sincronizarAtomos() {
 
         if (!escena || typeof atomos === "undefined") return;
 
@@ -482,7 +500,7 @@ function sincronizarEnlaces() {
         sincronizarEnlaces();
         sincronizarHidrogenosImplicitos();
         renderizar();
-    }
+}
 
     function renderizar() {
 
@@ -792,12 +810,23 @@ function desplazarCamara3D(dx, dy) {
         ajustarTamaño,
         sincronizarAtomos,
         sincronizarEnlaces,
-        seleccionarAtomo3D
+        seleccionarAtomo3D,
+        actualizarTamañoHidrogenos
     };
 
 })();
 
 window.motor3D = motor3D;
+
+window.addEventListener("biobuilder:ajuste-visual", evento => {
+
+    if (evento.detail.ajuste === "hidrogenos") {
+
+        motor3D.actualizarTamañoHidrogenos();
+
+    }
+
+});
 
 window.iniciarMotor3D = function () {
     motor3D.iniciar();
